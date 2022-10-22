@@ -2,6 +2,7 @@ const User = require("../models").User;
 const responseMessage = require("../utils/responseMessage");
 const jwt = require("jsonwebtoken");
 const config = require("../config/app");
+const { validationResult } = require("express-validator");
 
 module.exports.login = async (req, res) => {
   try {
@@ -34,14 +35,13 @@ module.exports.login = async (req, res) => {
 };
 module.exports.register = async (req, res) => {
   try {
-    console.log(req.body);
+
     const user = await User.create(req.body);
     // generate auth token
     const userWithToken = generateToken(user.get({ raw: true }));
     return res.json(userWithToken);
   } catch (error) {
     console.log(error);
-    console.log(error.errors[0].message);
 
     if (error.type == "ERROR") {
       console.log("=================");
