@@ -23,7 +23,7 @@ module.exports.login = async (req, res) => {
     }
     // generate auth token
     const userWithToken = generateToken(user.get({ raw: true }));
-
+    userWithToken.user.avatar = user.avatar;
     return res.json(userWithToken);
   } catch (error) {
     console.log(error);
@@ -35,10 +35,10 @@ module.exports.login = async (req, res) => {
 };
 module.exports.register = async (req, res) => {
   try {
-
     const user = await User.create(req.body);
     // generate auth token
     const userWithToken = generateToken(user.get({ raw: true }));
+    userWithToken.user.avatar = user.avatar;
     return res.json(userWithToken);
   } catch (error) {
     console.log(error);
@@ -55,8 +55,7 @@ module.exports.register = async (req, res) => {
 };
 
 const generateToken = (user) => {
-  console.log(user);
   delete user.password;
   const token = jwt.sign(user, config.appKey, { expiresIn: 86400 });
-  return { ...user, token };
+  return { ...{user}, ...{ token } };
 };

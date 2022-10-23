@@ -1,6 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 const bcrypt = require("bcrypt");
+const config = require("../config/app");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -22,7 +23,21 @@ module.exports = (sequelize, DataTypes) => {
       lastName: DataTypes.STRING,
       email: DataTypes.STRING,
       password: DataTypes.STRING,
-      avatar: DataTypes.STRING,
+      avatar: {
+        type: DataTypes.STRING,
+        get() {
+          const avatar = this.getDataValue("avatar");
+          const url = `${config.appUrl}:${config.appPort}`;
+          if (!avatar) {
+            return `${url}/${this.getDataValue("gender")}.svg`;
+          }
+          console.log(this.getDataValue("id"));
+
+          const id = this.getDataValue("id");
+          console.log(`${url}/uploads/user/${id}/${avatar}`);
+          return `${url}/uploads/user/${id}/${avatar}`;
+        },
+      },
       gender: DataTypes.STRING,
     },
     {
@@ -38,8 +53,6 @@ module.exports = (sequelize, DataTypes) => {
 };
 
 const hashPassword = async (user) => {
-  console.log(user.changed());
-  console.log(user.changed("password"));
   if (user.changed("password")) {
     user.password = await bcrypt.hashSync(user.password, 10);
   }
