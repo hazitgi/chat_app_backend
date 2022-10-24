@@ -2,12 +2,18 @@ const User = require("../models").User;
 const sequelize = require("sequelize");
 
 exports.update = async (req, res) => {
+  console.log("user update");
   try {
+    console.log(req.body);
     if (req.file) {
       req.body.avatar = req?.file?.filename;
     }
-    if (typeof req.body.avatar !== "undefined" && req.body.avatar.length === 0)
+    if (
+      typeof req.body.avatar !== "undefined" &&
+      req.body.avatar.length === 0
+    ) {
       delete req.body.avatar;
+    }
     const [rows, result] = await User.update(req.body, {
       where: {
         id: req.user.id,
@@ -16,7 +22,7 @@ exports.update = async (req, res) => {
       individualHooks: true,
     });
     const user = result[0].get({ raw: true });
-    user.avatar = result[0].avatar
+    user.avatar = result[0].avatar;
     delete user.password;
     return res.status(200).json(user);
   } catch (error) {

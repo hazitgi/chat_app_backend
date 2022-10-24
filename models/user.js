@@ -31,11 +31,8 @@ module.exports = (sequelize, DataTypes) => {
           if (!avatar) {
             return `${url}/${this.getDataValue("gender")}.svg`;
           }
-          console.log(this.getDataValue("id"));
-
           const id = this.getDataValue("id");
-          console.log(`${url}/uploads/user/${id}/${avatar}`);
-          return `${url}/uploads/user/${id}/${avatar}`;
+          return `${url}/user/${id}/${avatar}`;
         },
       },
       gender: DataTypes.STRING,

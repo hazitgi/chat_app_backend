@@ -29,7 +29,6 @@ exports.userFile = ((req, res, next) => {
   };
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      // console.log(file);
       const { id } = req.user;
       const dest = `uploads/user/${id}`;
 

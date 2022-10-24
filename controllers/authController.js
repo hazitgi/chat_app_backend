@@ -44,7 +44,6 @@ module.exports.register = async (req, res) => {
     console.log(error);
 
     if (error.type == "ERROR") {
-      console.log("=================");
       return res.status(400).json({ message: error?.message });
     } else {
       return res
