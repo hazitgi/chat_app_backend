@@ -26,6 +26,11 @@ exports.index = async (req, res) => {
           },
           {
             model: MessageModel,
+            include: [
+              {
+                model: UserModel,
+              },
+            ],
             limit: 20,
             order: [["id", "DESC"]],
           },
@@ -33,8 +38,7 @@ exports.index = async (req, res) => {
       },
     ],
   });
-  console.log(user);
-  return res.status(200).json(user);
+  return res.status(200).json(user.Chats);
 };
 
 exports.create = async (req, res) => {
@@ -117,9 +121,13 @@ exports.messages = async (req, res) => {
     where: {
       chatId: req.query.id,
     },
+    include: [
+      {
+        model: UserModel,
+      },
+    ],
     limit,
     offset,
-    include: [{}],
   });
   const totalPages = Math.ceil(messages.count / limit);
 
