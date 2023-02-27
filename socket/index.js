@@ -28,7 +28,7 @@ exports.socketServer = (server) => {
       }
       const onlineFriends = []; //ids
       const chatters = await getChattters(user.id); //query
-      console.log(chatters);
+      // console.log(chatters, "chatters");
 
       //   notify his friends that use is now online
 
@@ -57,12 +57,12 @@ exports.socketServer = (server) => {
     });
 
     socket.on("message", async (message) => {
-      console.log(message);
+      // console.log(message, "print message");
       let sockets = [];
 
-      console.log(users);
+      // console.log(users, "print users");
       if (users.has(message.fromUser.id)) {
-        socket = users.get(message.fromUser.id).sockets;
+        sockets = users.get(message.fromUser.id).sockets;
       }
 
       message.toUserId.forEach((id) => {
@@ -70,6 +70,7 @@ exports.socketServer = (server) => {
           sockets = [...sockets, ...users.get(id).sockets];
         }
       });
+      // console.log(sockets, ">>>>>>>>>> print from message");
 
       try {
         const msg = {
@@ -78,9 +79,10 @@ exports.socketServer = (server) => {
           chatId: message.chatId,
           message: message.message,
         };
-        await messageModel.create(msg)
+        const savedMessage = await messageModel.create(msg);
         message.User = message.fromUser;
         message.fromUserId = message.fromUser.id;
+        message.id = savedMessage.id;
 
         delete message.fromUser;
         sockets.forEach((socket) => {
@@ -92,7 +94,7 @@ exports.socketServer = (server) => {
     socket.on("disconnect", async () => {
       if (userSockets.has(socket.id)) {
         const user = users.get(userSockets.get(socket.id));
-        console.log(user);
+        // console.log(user);
         if (user.sockets.length > 1) {
           user.sockets = user.sockets.filter((sock) => {
             if (sock != socket.id) {
@@ -104,9 +106,9 @@ exports.socketServer = (server) => {
           });
           users.set(user.id, user);
         } else {
-          console.log("lllllllllllll oflien");
+          // console.log("lllllllllllll oflien");
           const chatters = await getChattters(user.id);
-          console.log(chatters, "lllllllllllll oflien");
+          // console.log(chatters, "lllllllllllll oflien");
           for (let i = 0; i < chatters.length; i++) {
             if (users.has(chatters[i])) {
               users.get(chatters[i]).sockets.forEach((socket) => {
