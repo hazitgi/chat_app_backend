@@ -160,3 +160,10 @@ exports.deleteChat = async (req, res) => {
     return res.status(500).json({ status: "Error", message: error.message });
   }
 };
+
+exports.imageUpload = (req, res) => {
+  if (req.file) {
+    return res.json({ url: req.file.filename });
+  }
+  return res.status(500).json({ message: "No image uploaded" });
+};
