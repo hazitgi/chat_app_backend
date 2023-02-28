@@ -57,7 +57,7 @@ exports.socketServer = (server) => {
     });
 
     socket.on("message", async (message) => {
-      // console.log(message, "print message");
+      console.log(message, "print message");
       let sockets = [];
 
       // console.log(users, "print users");
@@ -82,6 +82,7 @@ exports.socketServer = (server) => {
         const savedMessage = await messageModel.create(msg);
         message.User = message.fromUser;
         message.fromUserId = message.fromUser.id;
+        message.message = savedMessage.message;
         message.id = savedMessage.id;
 
         delete message.fromUser;
@@ -89,6 +90,18 @@ exports.socketServer = (server) => {
           io.to(socket).emit("received", message);
         });
       } catch (err) {}
+    });
+
+    socket.on("typing", async (message) => {
+      console.log(message,' typing ');
+      message.toUserId.forEach((id) => {
+        if (users.has(id)) {
+          users.get(id).sockets.forEach((socket) => {
+            console.log("emitting");
+            io.to(socket).emit("typing", message);
+          });
+        }
+      });
     });
 
     socket.on("disconnect", async () => {
