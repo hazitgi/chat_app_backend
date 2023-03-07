@@ -13,4 +13,6 @@ router.post(
   userController.update
 );
 
+router.get("/search-users", auth, userController.search);
+
 module.exports = router;

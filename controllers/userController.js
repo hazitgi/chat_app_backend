@@ -1,5 +1,6 @@
 const User = require("../models").User;
 const sequelize = require("sequelize");
+const db = require("../models");
 
 exports.update = async (req, res) => {
   console.log("user update");
@@ -34,5 +35,42 @@ exports.update = async (req, res) => {
         .status(500)
         .json({ message: error?.errors?.[0]?.message || error?.message });
     }
+  }
+};
+
+exports.search = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      where: {
+        [sequelize.Op.or]: {
+          namesConcated: sequelize.where(
+            sequelize.fn(
+              "concat",
+              sequelize.col("firstName"),
+              " ",
+              sequelize.col("lastName")
+            ),
+            {
+              [sequelize.Op.iLike]: `%${req.query.term}%`,
+            }
+          ),
+          email: {
+            [sequelize.Op.iLike]: `%${req.query.term}%`,
+          },
+        },
+        [sequelize.Op.not]: {
+          id: req.user.id,
+        },
+      },
+      attributes: { exclude: ["password"] },
+      raw: true,
+      limit: 10,
+    });
+    console.log(users);
+    return res.json(users);
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ message: error?.errors?.[0]?.message || error?.message });
   }
 };

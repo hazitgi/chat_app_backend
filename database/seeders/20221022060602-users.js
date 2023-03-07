@@ -14,24 +14,45 @@ module.exports = {
      */
 
     await queryInterface.bulkInsert("Users", [
+      // {
+      //   firstName: "Mohamed",
+      //   lastName: "Haseeb",
+      //   email: "hazitgi@gmail.com",
+      //   password: bcrypt.hashSync("12345678", 10),
+      //   gender: "male",
+      // },
+      // {
+      //   firstName: "Mohamed",
+      //   lastName: "Arshad",
+      //   email: "arshad@gmail.com",
+      //   password: bcrypt.hashSync("12345678", 10),
+      //   gender: "male",
+      // },
+      // {
+      //   firstName: "Shafna",
+      //   lastName: "Finu",
+      //   email: "shafna@gmail.com",
+      //   password: bcrypt.hashSync("12345678", 10),
+      //   gender: "female",
+      // },
       {
         firstName: "Mohamed",
-        lastName: "Haseeb",
-        email: "hazitgi@gmail.com",
+        lastName: "Junaid",
+        email: "junaid@gmail.com",
         password: bcrypt.hashSync("12345678", 10),
         gender: "male",
       },
       {
-        firstName: "Mohamed",
-        lastName: "Arshad",
-        email: "arshad@gmail.com",
+        firstName: "Jabir",
+        lastName: "EK",
+        email: "jabir@gmail.com",
         password: bcrypt.hashSync("12345678", 10),
         gender: "male",
       },
       {
-        firstName: "Shafna",
-        lastName: "Finu",
-        email: "shafna@gmail.com",
+        firstName: "Sabith",
+        lastName: "M",
+        email: "sabith@gmail.com",
         password: bcrypt.hashSync("12345678", 10),
         gender: "female",
       },
