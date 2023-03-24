@@ -6,6 +6,7 @@ const {
   deleteChat,
   imageUpload,
   addUserToGroup,
+  leaveCurrentChat,
 } = require("../controllers/chatController");
 const { validate } = require("../middleware/validator/validator");
 
@@ -17,5 +18,6 @@ router.get("/messages", [auth], messages);
 router.delete("/:id", [auth], deleteChat);
 router.post("/upload-image", [auth, chatFile], imageUpload);
 router.post("/add-user-to-group", auth, addUserToGroup);
+router.post("/leave-current-chat", auth, leaveCurrentChat);
 
 module.exports = router;

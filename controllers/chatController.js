@@ -166,14 +166,22 @@ exports.messages = async (req, res) => {
 
 exports.deleteChat = async (req, res) => {
   try {
-    await ChatModel.destroy({
-      where: {
-        id: req.params.id,
-      },
+    const { id } = req.params;
+    const chat = await ChatModel.findOne({
+      where: { id },
+
+      include: [
+        {
+          model: UserModel,
+        },
+      ],
     });
-    return res
-      .status(200)
-      .json({ status: "Success", message: "Chat deleted successfully" });
+
+    const notifyUsers = chat.Users.map((user) => user.id);
+
+    await chat.destroy();
+
+    return res.status(200).json({ chatId: id, notifyUsers });
   } catch (error) {
     return res.status(500).json({ status: "Error", message: error.message });
   }
@@ -210,6 +218,7 @@ exports.addUserToGroup = async (req, res) => {
       ],
     });
 
+    chat.Messages.reverse();
     // check if already in the group
     // await chat.Users.forEach((user) => {
     //   if (user.id === userId) {
@@ -228,11 +237,86 @@ exports.addUserToGroup = async (req, res) => {
 
     const newChatter = await UserModel.findOne({ where: { id: userId } });
 
+    console.log("chat type '>>>>>>>>>> '", chat.type);
     if (chat.type === "dual") {
-      chat.type === "group";
+      chat.type = "group";
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>");
       await chat.save();
     }
     return res.json({ chat, newChatter });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ status: "Error", message: error.message });
+  }
+};
+
+exports.leaveCurrentChat = async (req, res) => {
+  try {
+    console.log(req.body);
+    const { chatId } = req.body;
+    const chat = await ChatModel.findOne({
+      where: { id: chatId },
+      include: [
+        {
+          model: UserModel,
+        },
+      ],
+    });
+    if (chat.Users.length === 2) {
+      return res
+        .status(403)
+        .json({ state: "Error", message: "You can't leave this chat" });
+    }
+    if (chat.Users.length === 3) {
+      chat.type = "dual";
+      await chat.save();
+
+      await ChatUserModel.destroy({
+        where: {
+          chatId,
+          userId: req.user.id,
+        },
+      });
+
+      await MessageModel.destroy({
+        where: {
+          chatId,
+          fromUserId: req.user.id,
+        },
+      });
+
+      const notifyUsers = chat.Users.map((user) => user.id);
+
+      return res.status(200).json({
+        chatId: chat.id,
+        userId: req.user.id,
+        currentUserId: req.user.id,
+        notifyUsers,
+      });
+    } else if (chat.Users.length > 3) {
+      await ChatUserModel.destroy({
+        where: {
+          chatId,
+          userId: req.user.id,
+        },
+      });
+
+      await MessageModel.destroy({
+        where: {
+          chatId,
+          fromUserId: req.user.id,
+        },
+      });
+
+      const notifyUsers = chat.Users.map((user) => user.id);
+
+      return res.status(200).json({
+        chatId: chat.id,
+        userId: req.user.id,
+        currentUserId: req.user.id,
+        notifyUsers,
+      });
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: "Error", message: error.message });
