@@ -185,3 +185,56 @@ exports.imageUpload = (req, res) => {
   }
   return res.status(500).json({ message: "No image uploaded" });
 };
+
+exports.addUserToGroup = async (req, res) => {
+  try {
+    const { chatId, userId } = req.body;
+    const chat = await ChatModel.findOne({
+      where: {
+        id: chatId,
+      },
+      include: [
+        {
+          model: UserModel,
+        },
+        {
+          model: MessageModel,
+          include: [
+            {
+              model: UserModel,
+            },
+          ],
+          order: [["id", "DESC"]],
+          limit: 20,
+        },
+      ],
+    });
+
+    // check if already in the group
+    // await chat.Users.forEach((user) => {
+    //   if (user.id === userId) {
+    //     console.log(">>>>>>>>>>>>>>>>>>");
+    //     return res.status(403).json({ message: "User already in the group" });
+    //   }
+    // });
+    for (let user of chat.Users) {
+      if (user.id === userId) {
+        console.log(">>>>>>>>>>>>>>>>>>");
+        return res.status(403).json({ message: "User already in the group" });
+      }
+    }
+
+    await ChatUserModel.create({ chatId, userId });
+
+    const newChatter = await UserModel.findOne({ where: { id: userId } });
+
+    if (chat.type === "dual") {
+      chat.type === "group";
+      await chat.save();
+    }
+    return res.json({ chat, newChatter });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ status: "Error", message: error.message });
+  }
+};

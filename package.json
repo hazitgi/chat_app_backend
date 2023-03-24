@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./index.js",
-    "dev": "nodemon ./index.js"
+    "dev": "clear && nodemon ./index.js"
   },
   "author": "hazi_tgi",
   "license": "ISC",
